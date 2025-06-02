@@ -1,6 +1,7 @@
 package ai
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -122,8 +123,25 @@ func (p *imageRequest) PaddXServi(ctx echo.Context) error {
 			"error": "failed to parse resultBytes",
 		})
 	}
+
+	// 假設輸出的圖片為 *_res.png
+	visImagePath := filepath.Join(outputDir, nameOnly+"_ocr_res_img"+ext)
+	visImageBytes, err := os.ReadFile(visImagePath)
+	if err != nil {
+		return ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"error": "無法讀取定位後圖片",
+		})
+	}
+
+	// 將圖片轉為 base64
+	visImageBase64 := base64.StdEncoding.EncodeToString(visImageBytes)
 	// 給全資料
 	// return ctx.JSON(http.StatusOK, resultData)
 	// 只給filtered後的資料
-	return ctx.JSON(http.StatusOK, resultData["rec_filtered_texts"])
+	// return ctx.JSON(http.StatusOK, resultData["rec_filtered_texts"])
+		// 回傳 json 包含文字 + base64 圖片
+	return ctx.JSON(http.StatusOK, map[string]interface{}{
+		"filtered_texts": resultData["rec_filtered_texts"],
+		"image_base64":   visImageBase64,
+	})
 }
