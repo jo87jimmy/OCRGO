@@ -30,10 +30,9 @@ func NewImageToText() IImageToTextPresenter {
 // @Accept json multipart/form-data
 // @produce json
 // @param file formData file true "要上傳的圖片"
-// @success 200 object code.SuccessfulMessage{body=string} "成功後返回的值"
-// @failure 400 object code.ErrorMessage{detailed=string} "Bad Request"
-// @failure 415 object code.ErrorMessage{detailed=string} "必要欄位帶入錯誤"
-// @failure 500 object code.ErrorMessage{detailed=string} "Internal Server Error"
+// @Success 200 {object} map[string]interface{} "成功時回傳過濾後的 rec_texts 陣列"
+// @Failure 400 {object} map[string]string "無法取得圖片"
+// @Failure 500 {object} map[string]string "內部錯誤，例如圖片儲存錯誤、執行 CLI 錯誤或無法讀取結果檔案"
 // @Router /api/ai/image/orc/text [post]
 func (p *imageRequest) PaddXServi(ctx echo.Context) error {
 	// 1. 取得圖片
