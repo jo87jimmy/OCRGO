@@ -23,6 +23,18 @@ func NewImageToText() IImageToTextPresenter {
 	return &imageRequest{}
 }
 
+// @Summary AI 圖片Servi轉文字
+// @description 圖片Servi轉文字
+// @Tags ai 圖片轉文字
+// @version 1.0
+// @Accept json multipart/form-data
+// @produce json
+// @param file formData file true "要上傳的圖片"
+// @success 200 object code.SuccessfulMessage{body=string} "成功後返回的值"
+// @failure 400 object code.ErrorMessage{detailed=string} "Bad Request"
+// @failure 415 object code.ErrorMessage{detailed=string} "必要欄位帶入錯誤"
+// @failure 500 object code.ErrorMessage{detailed=string} "Internal Server Error"
+// @Router /api/ai/image/orc/text [post]
 func (p *imageRequest) PaddXServi(ctx echo.Context) error {
 	// 1. 取得圖片
 	file, err := ctx.FormFile("file")

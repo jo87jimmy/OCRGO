@@ -27,7 +27,7 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 
 	// Add more routes here
 	ai := api.Group("/ai")
-	ai.POST("/imageToText", r.imageToTextPresenter.PaddXServi)
+	ai.POST("/image/orc/text", r.imageToTextPresenter.PaddXServi)
 
 }
 
