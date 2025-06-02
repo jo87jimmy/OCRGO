@@ -18,6 +18,8 @@ import (
 // @host     localhost:9536
 // @BasePath  /
 
+//http://127.0.0.1:9536/api/swagger/
+
 func main() {
 	// Initialize the application
 	route := echo.New()

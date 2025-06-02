@@ -1,6 +1,8 @@
 package router
 
 import (
+	"OCRGO/docs"
+	"OCRGO/internal/pkg/util"
 	"OCRGO/internal/presenter/ai"
 
 	"github.com/labstack/echo/v4"
@@ -20,6 +22,12 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
 	}))
+	//蔡- swaggerEcho 如果 host 設定為     ""localhost""":9516 下面這段必加 因為要轉其他的ip 才不會遇到寫不進去cookie
+	if util.Source["ENV"]["SWAGGEROUTE"] != "" {
+		docs.SwaggerInfo.Title = util.Source["ENV"]["SWAGGERTITLE"]
+		docs.SwaggerInfo.Host = util.Source["ENV"]["SWAGGEROUTE"] + ":" + util.Source["ENV"]["PORT"]
+		docs.SwaggerInfo.BasePath = "/"
+	}
 
 	// API Routes
 	api := e.Group("/api")
