@@ -15,10 +15,10 @@ import (
 // @contact.name 小蔡資訊
 // @contact.url    https://jo87jimmy.github.io/
 // @contact.email  jo87jimmy@gmail.com
-// @host     localhost:9536
+// @host     localhost:9541
 // @BasePath  /
 
-//http://127.0.0.1:9536/api/swagger/
+//http://127.0.0.1:9541/api/swagger/
 
 func main() {
 	// Initialize the application
