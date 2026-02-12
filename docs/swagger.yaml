@@ -1,5 +1,26 @@
 basePath: /
-host: localhost:9536
+definitions:
+  code.ErrorMessage:
+    properties:
+      code:
+        type: integer
+      detailed: {}
+      message:
+        type: string
+      timestamp:
+        example: "2021-07-29T07:23:47Z"
+        type: string
+    type: object
+  code.SuccessfulMessage:
+    properties:
+      body: {}
+      code:
+        type: integer
+      timestamp:
+        example: "2021-07-29T07:23:47Z"
+        type: string
+    type: object
+host: localhost:9541
 info:
   contact:
     email: jo87jimmy@gmail.com
@@ -9,6 +30,59 @@ info:
   title: OCRGO API
   version: "1.0"
 paths:
+  /api/ai/image/classification:
+    post:
+      consumes:
+      - json multipart/form-data
+      description: 圖片分類
+      parameters:
+      - description: 要上傳的圖片
+        in: formData
+        name: file
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功後返回的值
+          schema:
+            allOf:
+            - $ref: '#/definitions/code.SuccessfulMessage'
+            - properties:
+                body:
+                  type: string
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/code.ErrorMessage'
+            - properties:
+                detailed:
+                  type: string
+              type: object
+        "415":
+          description: 必要欄位帶入錯誤
+          schema:
+            allOf:
+            - $ref: '#/definitions/code.ErrorMessage'
+            - properties:
+                detailed:
+                  type: string
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/code.ErrorMessage'
+            - properties:
+                detailed:
+                  type: string
+              type: object
+      summary: AI 圖片分類
+      tags:
+      - ai 圖片分類
   /api/ai/image/orc/text:
     post:
       consumes:

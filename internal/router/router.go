@@ -1,6 +1,8 @@
 package router
 
 import (
+	"net/http"
+
 	"OCRGO/docs"
 	"OCRGO/internal/pkg/util"
 	"OCRGO/internal/presenter/ai"
@@ -20,7 +22,8 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowMethods: []string{echo.GET, echo.POST, echo.PUT, echo.DELETE, echo.OPTIONS},
+		// 使用 net/http 的常量，因為 echo v4 不再匯出 HTTP 方法常量
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 	}))
 	//蔡- swaggerEcho 如果 host 設定為     ""localhost""":9516 下面這段必加 因為要轉其他的ip 才不會遇到寫不進去cookie
 	if util.Source["ENV"]["SWAGGEROUTE"] != "" {
@@ -33,18 +36,20 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 	api := e.Group("/api")
 	api.GET("/swagger/*any", echoSwagger.WrapHandler)
 
-	// Add more routes here
 	ai := api.Group("/ai")
 	ai.POST("/image/orc/text", r.imageToTextPresenter.PaddXServi)
+	ai.POST("/image/classification", r.imageToClassificationPresenter.ClassifyImage)
 
 }
 
 type Router struct {
-	imageToTextPresenter ai.IImageToTextPresenter
+	imageToTextPresenter           ai.IImageToTextPresenter
+	imageToClassificationPresenter ai.IImageClassificationPresenter
 }
 
-func NewRouter(ai ai.IImageToTextPresenter) IRouter {
+func NewRouter(aiText ai.IImageToTextPresenter, aiClass ai.IImageClassificationPresenter) IRouter {
 	return &Router{
-		imageToTextPresenter: ai,
+		imageToTextPresenter:           aiText,
+		imageToClassificationPresenter: aiClass,
 	}
 }

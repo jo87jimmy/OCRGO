@@ -4,9 +4,10 @@ import (
 	"OCRGO/internal/pkg/util"
 	"OCRGO/internal/router"
 
-	"github.com/labstack/echo/v4"
-	// "CAGo/internal/router/swagger"
+	_ "OCRGO/docs"
 	presenterAi "OCRGO/internal/presenter/ai"
+
+	"github.com/labstack/echo/v4"
 )
 
 // @title           OCRGO API
@@ -24,8 +25,9 @@ func main() {
 	// Initialize the application
 	route := echo.New()
 
-	presenterAi := presenterAi.NewImageToText()
-	router := router.NewRouter(presenterAi)
+	presenterText := presenterAi.NewImageToText()
+	presenterClass := presenterAi.NewImageClassification()
+	router := router.NewRouter(presenterText, presenterClass)
 	router.InitRoutes(route)
 
 	// Start the application

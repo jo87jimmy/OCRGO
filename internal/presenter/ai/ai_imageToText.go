@@ -139,7 +139,7 @@ func (p *imageRequest) PaddXServi(ctx echo.Context) error {
 	// return ctx.JSON(http.StatusOK, resultData)
 	// 只給filtered後的資料
 	// return ctx.JSON(http.StatusOK, resultData["rec_filtered_texts"])
-		// 回傳 json 包含文字 + base64 圖片
+	// 回傳 json 包含文字 + base64 圖片
 	return ctx.JSON(http.StatusOK, map[string]interface{}{
 		"filtered_texts": resultData["rec_filtered_texts"],
 		"image_base64":   visImageBase64,
