@@ -7,6 +7,9 @@ import (
 	"io"
 	"net/http"
 
+	_ "image/jpeg" // 蔡- 註冊 JPEG 解碼器
+	_ "image/png"  // 蔡- 註冊 PNG 解碼器
+
 	"github.com/labstack/echo/v4"
 	"github.com/nfnt/resize"
 	ort "github.com/yalue/onnxruntime_go"
