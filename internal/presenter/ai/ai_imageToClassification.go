@@ -105,8 +105,8 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 	modelPath := "D:/Golang/src/OCR/OCRGO/network.onnx"
 	session, err := ort.NewAdvancedSession(
 		modelPath,
-		[]string{"input.1"}, // Replace with your model's input name
-		[]string{"700"},     // Replace with your model's output name
+		[]string{"input.1"}, // model's input name
+		[]string{"700"},     // model's output name
 		[]ort.Value{inputTensor},
 		[]ort.Value{outputTensor},
 		nil,
@@ -152,23 +152,23 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 		predictedClass = classLabels[maxIndex]
 	}
 
-	return ctx.JSON(http.StatusOK, map[string]interface{}{"result": predictedClass})
+	return ctx.JSON(http.StatusOK, map[string]any{"result": predictedClass})
 }
 
-// Helper function: preprocess the image into a normalized float32 array
+// 蔡- 輔助函數：將影像預處理成歸一化的 float32 數組
 func preprocessImage(img image.Image) []float32 {
 	bounds := img.Bounds()
 	width, height := bounds.Max.X, bounds.Max.Y
 
-	// 初始化輸出數組 [1, 3, 256, 256]
+	//蔡- 初始化輸出數組 [1, 3, 256, 256]
 	output := make([]float32, 1*3*256*256) // Adjust dimensions as needed
 
-	// 遍歷圖像像素
-	for y := 0; y < height; y++ {
-		for x := 0; x < width; x++ {
+	//蔡- 遍歷圖像像素
+	for y := range height {
+		for x := range width {
 			r, g, b, _ := img.At(x, y).RGBA()
 
-			// 將 uint32 轉換為 float32 並進行標準化 (0-1)
+			//蔡- 將 uint32 轉換為 float32 並進行標準化 (0-1)
 			index := y*width + x
 			output[index] = float32(r>>8) / 255.0
 			output[index+256*256] = float32(g>>8) / 255.0
