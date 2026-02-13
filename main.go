@@ -25,9 +25,12 @@ func main() {
 	// Initialize the application
 	route := echo.New()
 
-	presenterText := presenterAi.NewImageToText()
-	presenterClass := presenterAi.NewImageClassification()
-	router := router.NewRouter(presenterText, presenterClass)
+	presenterText := presenterAi.NewImageToTextPresenter()
+	presenterTextV2 := presenterAi.NewImageToTextPresenterV2()
+	presenterClass := presenterAi.NewImageClassificationPresenter()
+	presenterClassV2 := presenterAi.NewImageClassificationPresenterV2()
+
+	router := router.NewRouter(presenterText, presenterClass, presenterTextV2, presenterClassV2)
 	router.InitRoutes(route)
 
 	// Start the application

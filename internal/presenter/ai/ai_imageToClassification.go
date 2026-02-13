@@ -15,18 +15,23 @@ import (
 	ort "github.com/yalue/onnxruntime_go"
 )
 
-type IImageClassificationPresenter interface {
+// ImageClassificationPresenter 定義圖片分類 Presenter 的介面 (Basic/V1)
+type ImageClassificationPresenter interface {
 	ClassifyImage(ctx echo.Context) error
 }
 
-type presenter struct {
-	Photo []byte `json:"Photo"` // Ensure this is base64 decoded
+// imageClassificationPresenter 實作 ImageClassificationPresenter 介面
+type imageClassificationPresenter struct {
+	// 蔡- Photo 欄位未使用，但保留結構定義
+	Photo []byte `json:"Photo"`
 }
 
-func NewImageClassification() IImageClassificationPresenter {
-	return &presenter{}
+// NewImageClassificationPresenter 建立 ImageClassificationPresenter 的實例
+func NewImageClassificationPresenter() ImageClassificationPresenter {
+	return &imageClassificationPresenter{}
 }
 
+// ClassifyImage 執行圖片分類
 // @Summary AI 圖片分類
 // @description 圖片分類
 // @Tags ai 圖片分類
@@ -39,44 +44,41 @@ func NewImageClassification() IImageClassificationPresenter {
 // @failure 415 object code.ErrorMessage{detailed=string} "必要欄位帶入錯誤"
 // @failure 500 object code.ErrorMessage{detailed=string} "Internal Server Error"
 // @Router /api/ai/image/classification [post]
-func (p *presenter) ClassifyImage(ctx echo.Context) error {
-	//蔡- 獲取圖片
+func (p *imageClassificationPresenter) ClassifyImage(ctx echo.Context) error {
+	// 蔡- 獲取圖片
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		return ctx.JSON(http.StatusOK, code.GetCodeMessage(code.FormatError, err.Error()))
 	}
 
-	//蔡- 開啟圖片檔案
-	//蔡- 第一次呼叫 file.Open() 是為了讀取檔案的內容。 您需要讀取文件的內容來將其儲存到記憶體中，以便進一步處理和操作。
+	// 蔡- 開啟圖片檔案
+	// 第一次呼叫 file.Open() 是為了讀取檔案的內容
 	multipartFile, err := file.Open()
-	if err != nil {
-		return ctx.JSON(http.StatusOK, code.GetCodeMessage(code.FormatError, err.Error()))
-	}
-
-	//蔡- 讀取圖片數據
-	fileData, err := io.ReadAll(multipartFile)
 	if err != nil {
 		return ctx.JSON(http.StatusOK, code.GetCodeMessage(code.FormatError, err.Error()))
 	}
 	defer multipartFile.Close()
 
-	//蔡- 解碼影像資料
+	// 蔡- 讀取圖片數據
+	fileData, err := io.ReadAll(multipartFile)
+	if err != nil {
+		return ctx.JSON(http.StatusOK, code.GetCodeMessage(code.FormatError, err.Error()))
+	}
+
+	// 蔡- 解碼影像資料
 	img, _, err := image.Decode(bytes.NewReader(fileData))
 	if err != nil {
 		return ctx.JSON(http.StatusBadRequest, map[string]string{"error": "Failed to decode image"})
 	}
 
-	//蔡- 將影像大小調整為 256x256
+	// 蔡- 將影像大小調整為 256x256
 	resizedImg := resize.Resize(256, 256, img, resize.Lanczos3)
 
-	//蔡- 將影像轉換為形狀為 [1, 3, 256, 256] 的 float32 數組
-	inputData := preprocessImage(resizedImg) // Implement this to extract pixel values
+	// 蔡- 將影像轉換為形狀為 [1, 3, 256, 256] 的 float32 數組
+	inputData := preprocessImage(resizedImg)
 
-	//蔡- Initialize the ONNX runtime environment
-	// Set the path to the ONNX Runtime shared library
-	// 取得 onnxruntime.dll 的相對路徑
-	// dllPath, _ := filepath.Abs("onnxruntime.dll")
-	// ort.SetSharedLibraryPath(dllPath)
+	// 蔡- 初始化 ONNX runtime 環境
+	// 注意：在生產環境中，這應該只執行一次 (Singleton)，而不是每個請求都執行
 	ort.SetSharedLibraryPath("./onnxruntime.dll")
 	err = ort.InitializeEnvironment()
 	if err != nil {
@@ -92,16 +94,15 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 	}
 	defer inputTensor.Destroy()
 
-	// Define output tensor shape (example: [1, 11])
-	outputShape := ort.NewShape(1, 11) // Adjust this based on your model's output
+	// Define output tensor shape
+	outputShape := ort.NewShape(1, 11)
 	outputTensor, err := ort.NewEmptyTensor[float32](outputShape)
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to create output tensor"})
 	}
 	defer outputTensor.Destroy()
 
-	//蔡- 注意:請確保替換 input_name 和 output_name 為你的模型的實際輸入和輸出名稱。你可以使用 ONNX 的工具來查看模型的輸入和輸出名稱，例如：
-	//蔡- 先到 https://github.com/lutzroeder/Netron?tab=readme-ov-file 中下載 Netron
+	// 蔡- 載入模型並建立 Session
 	modelPath := "D:/Golang/src/OCR/OCRGO/network.onnx"
 	session, err := ort.NewAdvancedSession(
 		modelPath,
@@ -116,21 +117,19 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 	}
 	defer session.Destroy()
 
-	//- 運行推理
+	// 蔡- 運行推理
 	err = session.Run()
 	if err != nil {
 		return ctx.JSON(http.StatusInternalServerError, map[string]string{"error": "推理失敗"})
 	}
-	//蔡- 獲取輸出數據
+
+	// 蔡- 獲取輸出數據
 	outputData := outputTensor.GetData()
-	//蔡- 定義類別標籤列表
 	classLabels := []string{
 		"麵包", "乳製品", "點心", "蛋", "油炸食品", "肉", "義大利麵", "米", "海鮮", "湯", "蔬果",
 	}
-	//蔡- Define the threshold
 	threshold := float32(4.5)
 
-	//蔡- Check if all scores are below the threshold
 	allBelowThreshold := true
 	maxIndex := 0
 	maxScore := outputData[0]
@@ -144,7 +143,6 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 		}
 	}
 
-	// Map the index to the corresponding class label or set to "無法辨識"
 	var predictedClass string
 	if allBelowThreshold {
 		predictedClass = "無法辨識"
@@ -153,27 +151,4 @@ func (p *presenter) ClassifyImage(ctx echo.Context) error {
 	}
 
 	return ctx.JSON(http.StatusOK, map[string]any{"result": predictedClass})
-}
-
-// 蔡- 輔助函數：將影像預處理成歸一化的 float32 數組
-func preprocessImage(img image.Image) []float32 {
-	bounds := img.Bounds()
-	width, height := bounds.Max.X, bounds.Max.Y
-
-	//蔡- 初始化輸出數組 [1, 3, 256, 256]
-	output := make([]float32, 1*3*256*256) // Adjust dimensions as needed
-
-	//蔡- 遍歷圖像像素
-	for y := range height {
-		for x := range width {
-			r, g, b, _ := img.At(x, y).RGBA()
-
-			//蔡- 將 uint32 轉換為 float32 並進行標準化 (0-1)
-			index := y*width + x
-			output[index] = float32(r>>8) / 255.0
-			output[index+256*256] = float32(g>>8) / 255.0
-			output[index+2*256*256] = float32(b>>8) / 255.0
-		}
-	}
-	return output
 }

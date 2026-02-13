@@ -37,19 +37,25 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 	api.GET("/swagger/*any", echoSwagger.WrapHandler)
 
 	ai := api.Group("/ai")
-	ai.POST("/image/orc/text", r.imageToTextPresenter.PaddXServi)
+	ai.POST("/image/orc/text", r.imageToTextPresenter.ExtractText)
 	ai.POST("/image/classification", r.imageToClassificationPresenter.ClassifyImage)
+	ai.POST("/image/orc/text/v2", r.imageToTextPresenterV2.ExtractText)
+	ai.POST("/image/classification/v2", r.imageToClassificationPresenterV2.ClassifyImage)
 
 }
 
 type Router struct {
-	imageToTextPresenter           ai.IImageToTextPresenter
-	imageToClassificationPresenter ai.IImageClassificationPresenter
+	imageToTextPresenter             ai.ImageToTextPresenter
+	imageToClassificationPresenter   ai.ImageClassificationPresenter
+	imageToTextPresenterV2           ai.ImageToTextPresenterV2
+	imageToClassificationPresenterV2 ai.ImageClassificationPresenterV2
 }
 
-func NewRouter(aiText ai.IImageToTextPresenter, aiClass ai.IImageClassificationPresenter) IRouter {
+func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter, aiTextV2 ai.ImageToTextPresenterV2, aiClassV2 ai.ImageClassificationPresenterV2) IRouter {
 	return &Router{
-		imageToTextPresenter:           aiText,
-		imageToClassificationPresenter: aiClass,
+		imageToTextPresenter:             aiText,
+		imageToClassificationPresenter:   aiClass,
+		imageToTextPresenterV2:           aiTextV2,
+		imageToClassificationPresenterV2: aiClassV2,
 	}
 }

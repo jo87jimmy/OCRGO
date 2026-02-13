@@ -11,6 +11,7 @@ const (
 	DoesNotExist         = 404
 	FormatError          = 415
 	InternalServerError  = 500
+	SystemError          = 500
 	ServerDown           = 503
 	StatusGatewayTimeout = 504
 )
