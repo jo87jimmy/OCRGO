@@ -40,7 +40,7 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 	ai.POST("/image/orc/text", r.imageToTextPresenter.ExtractText)
 	ai.POST("/image/classification", r.imageToClassificationPresenter.ClassifyImage)
 	ai.POST("/image/orc/text/v2", r.imageToTextPresenterV2.ExtractText)
-	ai.POST("/image/classification/v2", r.imageToClassificationPresenterV2.ClassifyImage)
+	// ai.POST("/image/classification/v2", r.imageToClassificationPresenterV2.ClassifyImage)
 
 }
 
@@ -52,6 +52,7 @@ type Router struct {
 }
 
 func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter, aiTextV2 ai.ImageToTextPresenterV2, aiClassV2 ai.ImageClassificationPresenterV2) IRouter {
+	// func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter, aiTextV2 ai.ImageToTextPresenterV2) IRouter {
 	return &Router{
 		imageToTextPresenter:             aiText,
 		imageToClassificationPresenter:   aiClass,

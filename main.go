@@ -31,6 +31,7 @@ func main() {
 	presenterClassV2 := presenterAi.NewImageClassificationPresenterV2()
 
 	router := router.NewRouter(presenterText, presenterClass, presenterTextV2, presenterClassV2)
+	// router := router.NewRouter(presenterText, presenterClass, presenterTextV2)
 	router.InitRoutes(route)
 
 	// Start the application
