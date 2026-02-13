@@ -50,7 +50,7 @@ func NewImageToTextPresenterV2() ImageToTextPresenterV2 {
 // @Failure 400 {object} map[string]string "無法取得圖片"
 // @Failure 500 {object} map[string]string "內部錯誤"
 // @Failure 503 {object} map[string]string "伺服器忙碌中"
-// @Router /api/ai/image/orc/text [post]
+// @Router /api/ai/image/orc/text/v2 [post]
 func (p *imageToTextPresenterV2) ExtractText(ctx echo.Context) error {
 	// 1. 取得圖片
 	file, err := ctx.FormFile("file")

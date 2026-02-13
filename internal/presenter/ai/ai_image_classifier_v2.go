@@ -87,7 +87,7 @@ func NewImageClassificationPresenterV2() ImageClassificationPresenterV2 {
 // @failure 415 object code.ErrorMessage{detailed=string} "必要欄位帶入錯誤"
 // @failure 500 object code.ErrorMessage{detailed=string} "Internal Server Error"
 // @failure 503 object code.ErrorMessage{detailed=string} "Service Unavailable"
-// @Router /api/ai/image/classification [post]
+// @Router /api/ai/image/classification/v2 [post]
 func (p *imageClassificationPresenterV2) ClassifyImage(ctx echo.Context) error {
 	// 1. 檢查 ONNX 環境是否正常
 	if onnxEnvErr != nil {

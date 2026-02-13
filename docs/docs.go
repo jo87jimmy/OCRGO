@@ -117,9 +117,125 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/ai/image/classification/v2": {
+            "post": {
+                "description": "圖片分類 (高併發優化版)",
+                "consumes": [
+                    "json multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai 圖片分類"
+                ],
+                "summary": "AI 圖片分類",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "要上傳的圖片",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功後返回的值",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/code.SuccessfulMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "body": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/code.ErrorMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "detailed": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "415": {
+                        "description": "必要欄位帶入錯誤",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/code.ErrorMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "detailed": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/code.ErrorMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "detailed": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/code.ErrorMessage"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "detailed": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/ai/image/orc/text": {
             "post": {
-                "description": "圖片Servi轉文字",
+                "description": "圖片轉文字",
                 "consumes": [
                     "json multipart/form-data"
                 ],
@@ -129,7 +245,7 @@ const docTemplate = `{
                 "tags": [
                     "ai 圖片轉文字"
                 ],
-                "summary": "AI 圖片Servi轉文字",
+                "summary": "AI 圖片轉文字",
                 "parameters": [
                     {
                         "type": "file",
@@ -157,7 +273,67 @@ const docTemplate = `{
                         }
                     },
                     "500": {
-                        "description": "內部錯誤，例如圖片儲存錯誤、執行 CLI 錯誤或無法讀取結果檔案",
+                        "description": "內部錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ai/image/orc/text/v2": {
+            "post": {
+                "description": "圖片轉文字 (支援高併發與水平擴展)",
+                "consumes": [
+                    "json multipart/form-data"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "ai 圖片轉文字"
+                ],
+                "summary": "AI 圖片轉文字",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "要上傳的圖片",
+                        "name": "file",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功時回傳過濾後的 rec_texts 陣列",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    },
+                    "400": {
+                        "description": "無法取得圖片",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "內部錯誤",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "503": {
+                        "description": "伺服器忙碌中",
                         "schema": {
                             "type": "object",
                             "additionalProperties": {
