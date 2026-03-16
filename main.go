@@ -30,17 +30,18 @@ func main() {
 	// 初始化業務邏輯依賴 (Dependency Injection)
 	// 實例化圖片轉文字 (OCR) 的 Presenter (V1 版本)，封裝具體的 OCR 處理邏輯
 	presenterText := presenterAi.NewImageToTextPresenter()
-	// 實例化圖片轉文字 (OCR) 的 Presenter (V2 版本)，高併發、Vertical Scale
+	//蔡- 實例化圖片轉文字 (OCR) 的 Presenter (V2 版本)，高併發、Vertical Scale
 	presenterTextV2 := presenterAi.NewImageToTextPresenterV2()
 	// 實例化圖片分類的 Presenter (V1 版本)，封裝圖片分類的業務邏輯
 	presenterClass := presenterAi.NewImageClassificationPresenter()
-	// 實例化圖片分類的 Presenter (V2 版本)，高併發、Vertical Scale
+	//蔡- 實例化圖片分類的 Presenter (V2 版本)，高併發、Vertical Scale
 	presenterClassV2 := presenterAi.NewImageClassificationPresenterV2()
 
 	// 初始化路由管理器，並將所有的 Presenter 依賴注入到路由器中
-	// 將路由層與業務邏輯層解耦，便於測試與維護
+	//蔡- 將路由層與業務邏輯層解耦，便於測試與維護
 	router := router.NewRouter(presenterText, presenterClass, presenterTextV2, presenterClassV2)
-	// router := router.NewRouter(presenterText, presenterClass, presenterTextV2)
+	// router := router.NewRouter(presenterText, presenterClass)
+
 	// 註冊所有 API 路由路徑到 Echo 實例中
 	router.InitRoutes(route)
 

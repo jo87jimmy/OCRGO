@@ -41,9 +41,10 @@ func (r *Router) InitRoutes(e *echo.Echo) {
 	api := e.Group("/api")                            // 建立一個路由群組 "/api"，所有此群組下的路徑都會以此開頭
 	api.GET("/swagger/*any", echoSwagger.WrapHandler) // 註冊 Swagger UI 路由，訪問 /api/swagger/* 即可查看 API 文件
 
-	ai := api.Group("/ai")                                                                // 在 "/api" 下建立子路由群組 "/ai"，專門處理 AI 相關請求
-	ai.POST("/image/orc/text", r.imageToTextPresenter.ExtractText)                        // 註冊 POST /api/ai/image/orc/text路由，處理圖片 OCR 轉文字請求
-	ai.POST("/image/classification", r.imageToClassificationPresenter.ClassifyImage)      // 註冊 POST /api/ai/image/classification 路由，處理圖片分類請求
+	ai := api.Group("/ai")                                                           // 在 "/api" 下建立子路由群組 "/ai"，專門處理 AI 相關請求
+	ai.POST("/image/orc/text", r.imageToTextPresenter.ExtractText)                   // 註冊 POST /api/ai/image/orc/text路由，處理圖片 OCR 轉文字請求
+	ai.POST("/image/classification", r.imageToClassificationPresenter.ClassifyImage) // 註冊 POST /api/ai/image/classification 路由，處理圖片分類請求
+	//蔡- 註冊第二版高併發、Vertical Scale的路由
 	ai.POST("/image/orc/text/v2", r.imageToTextPresenterV2.ExtractText)                   // 註冊 POST /api/ai/image/orc/text/v2 路由，處理第二版高併發、Vertical Scale OCR 轉文字請求
 	ai.POST("/image/classification/v2", r.imageToClassificationPresenterV2.ClassifyImage) // 註冊 POST /api/ai/image/classification/v2 路由，處理第二版高併發、Vertical Scale圖片分類請求
 
@@ -57,7 +58,7 @@ type Router struct {
 	imageToClassificationPresenterV2 ai.ImageClassificationPresenterV2 // 用於處理第二版高併發、Vertical Scale圖片分類 (Classification V2) 的 Presenter
 }
 
-// NewRouter 建構函式用於創建並初始化 Router 實例，依賴注入所有需要的 Presenter
+// 蔡- NewRouter 建構函式用於創建並初始化 Router 實例，依賴注入所有需要的 Presenter
 func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter, aiTextV2 ai.ImageToTextPresenterV2, aiClassV2 ai.ImageClassificationPresenterV2) IRouter {
 	//func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter,
 	// 透過依賴注入的方式傳入各個 Presenter 實例，並返回配置好的 Router 指標
@@ -68,3 +69,12 @@ func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPre
 		imageToClassificationPresenterV2: aiClassV2, // 初始化 imageToClassificationPresenterV2 欄位
 	}
 }
+
+// func NewRouter(aiText ai.ImageToTextPresenter, aiClass ai.ImageClassificationPresenter) IRouter {
+
+// 	// 透過依賴注入的方式傳入各個 Presenter 實例，並返回配置好的 Router 指標
+// 	return &Router{
+// 		imageToTextPresenter:           aiText,  // 初始化 imageToTextPresenter 欄位
+// 		imageToClassificationPresenter: aiClass, // 初始化 imageToClassificationPresenter 欄位
+// 	}
+// }
